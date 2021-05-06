@@ -24,17 +24,6 @@ use crate::eval::{Eval, EvalError};
 use crate::num::Num;
 use std::collections::HashMap;
 
-#[derive(Clone)]
-pub struct Number {
-    pub value: Num,
-}
-
-impl Eval for Number {
-    fn eval(self, _env: &mut HashMap<String, Num>) -> Result<Num, EvalError> {
-        Ok(self.value)
-    }
-}
-
 pub struct Add<T: Eval, U: Eval> {
     pub left: T,
     pub right: U,
@@ -86,5 +75,46 @@ pub struct Neg<T: Eval> {
 impl<T: Eval> Eval for Neg<T> {
     fn eval(self, env: &mut HashMap<String, Num>) -> Result<Num, EvalError> {
         Ok(-self.value.eval(env)?)
+    }
+}
+
+pub struct Abs<T: Eval> {
+    pub value: T,
+}
+
+impl<T: Eval> Eval for Abs<T> {
+    fn eval(self, env: &mut HashMap<String, Num>) -> Result<Num, EvalError> {
+        Ok(self.value.eval(env)?.abs())
+    }
+}
+
+pub struct Floor<T: Eval> {
+    pub value: T,
+}
+
+impl<T: Eval> Eval for Floor<T> {
+    fn eval(self, env: &mut HashMap<String, Num>) -> Result<Num, EvalError> {
+        Ok(self.value.eval(env)?.floor()?)
+    }
+}
+
+pub struct Ln<T: Eval> {
+    pub value: T,
+}
+
+impl<T: Eval> Eval for Ln<T> {
+    fn eval(self, env: &mut HashMap<String, Num>) -> Result<Num, EvalError> {
+        Ok(self.value.eval(env)?.ln())
+    }
+}
+
+pub struct Log<T: Eval, U: Eval> {
+    pub value: T,
+    pub base: U,
+}
+
+impl<T: Eval, U: Eval> Eval for Log<T, U> {
+    fn eval(self, env: &mut HashMap<String, Num>) -> Result<Num, EvalError> {
+        Ok(self.value.eval(env)?.log(self.base.eval(env)?)?)
     }
 }
